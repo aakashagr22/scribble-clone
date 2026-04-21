@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id          String   @id @default(uuid())
+  username    String   @unique
+  avatarUrl   String?
+  played      Int      @default(0)
+  won         Int      @default(0)
+  totalPoints Int      @default(0)
+  scores      Score[]
+  createdAt   DateTime @default(now())
+}
+
+model RoomHistory {
+  id          String   @id @default(uuid())
+  roomCode    String
+  hostId      String
+  maxPlayers  Int
+  rounds      Int
+  status      String   @default("FINISHED") // ACTIVE, FINISHED, ABORTED
+  scores      Score[]
+  createdAt   DateTime @default(now())
+}
+
+model Score {
+  id            String      @id @default(uuid())
+  points        Int         @default(0)
+  userId        String?
+  roomId        String
+  user          User?       @relation(fields: [userId], references: [id])
+  room          RoomHistory @relation(fields: [roomId], references: [id])
+}
+
+model Word {
+  id         String @id @default(uuid())
+  word       String @unique
+  category   String @default("general")
+  difficulty Int    @default(1)
+}
